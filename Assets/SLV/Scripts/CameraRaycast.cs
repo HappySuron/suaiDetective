@@ -1,7 +1,9 @@
 using UnityEngine;
+using UnityEngine.UI;
 using Cinemachine;
 using StarterAssets;
-using System.Linq; // Add this line
+using System.Linq;
+using TMPro;
 
 public class CameraRaycast : MonoBehaviour
 {
@@ -19,16 +21,23 @@ public class CameraRaycast : MonoBehaviour
     public GameObject thirdPersonControllerObject; // Ссылка на объект с контроллером персонажа
     private ThirdPersonController thirdPersonController; // Ссылка на скрипт ThirdPersonController
 
-    private GameObject currentOptionsObject; // Объект UI Options, на который наведена мышь
-
-    // Присваиваем ссылку на StateTree для получения доступных опций
     public StateTree stateTree;
 
     private bool isMouseHeld = false;
 
+    // UI элементы для отображения доступных опций
+    private TMP_Text  ActionTextW;
+    private TMP_Text  ActionTextS;
+    private TMP_Text  ActionTextA;
+    private TMP_Text  ActionTextD;
+
+    private Image imageW;
+    private Image imageA;
+    private Image imageS;
+    private Image imageD;
+
     void Start()
     {
-        
         virtualCamera = GetComponent<CinemachineVirtualCamera>();
         if (virtualCamera != null)
         {
@@ -55,7 +64,6 @@ public class CameraRaycast : MonoBehaviour
             Debug.LogError("Виртуальная камера не найдена.");
         }
 
-        // Пытаемся получить ссылку на скрипт ThirdPersonController на другом объекте
         if (thirdPersonControllerObject != null)
         {
             thirdPersonController = thirdPersonControllerObject.GetComponent<ThirdPersonController>();
@@ -74,7 +82,6 @@ public class CameraRaycast : MonoBehaviour
     {
         if (mainCamera == null) return;
 
-        // Создаем луч для наведения из центра экрана
         Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
         Debug.DrawRay(ray.origin, ray.direction * rayDistance, Color.green);
@@ -97,31 +104,29 @@ public class CameraRaycast : MonoBehaviour
             {
                 SetCircleColor(currentHighlightedObject, closeColor);
                 stateTree = hitObject.GetComponent<StateTree>();
-                if (Input.GetMouseButton(0) && stateTree !=null) // ЛКМ удерживаем
+                if (Input.GetMouseButton(0) && stateTree != null) // ЛКМ удерживаем
                 {
                     if (!isCameraFrozen)
                     {
                         Debug.Log($"Удерживаем ЛКМ на объекте: {hitObject.name}");
                         FreezeCamera(true);
                         isCameraFrozen = true;
-                        SetOptionsActive(currentHighlightedObject, true);
-                        // Отключаем контроллер персонажа
+
                         if (thirdPersonController != null)
                         {
                             thirdPersonController.enabled = false;
                             Debug.Log("Контроллер персонажа отключен.");
                         }
                     }
-                    SetCircleColor(currentHighlightedObject, clickedColor); // Цвет круга изменится на "кликнутый"
+                    SetCircleColor(currentHighlightedObject, clickedColor);
 
-                    // Показываем доступные опции, получаем их из дерева состояний
                     if (!isMouseHeld)
                     {
                         isMouseHeld = true;
-                        ShowOptions();
+                        ShowOptions(currentHighlightedObject);
                     }
                 }
-                else // ЛКМ отпущена
+                else
                 {
                     if (isCameraFrozen)
                     {
@@ -129,7 +134,6 @@ public class CameraRaycast : MonoBehaviour
                         FreezeCamera(false);
                         isCameraFrozen = false;
 
-                        // Включаем контроллер персонажа
                         if (thirdPersonController != null)
                         {
                             thirdPersonController.enabled = true;
@@ -144,28 +148,27 @@ public class CameraRaycast : MonoBehaviour
                     }
                 }
 
-                // Обработка выбора опций через WASD
                 if (isMouseHeld)
                 {
-                    if (Input.GetKeyDown(KeyCode.W)) // W для первого выбора
+                    if (Input.GetKeyDown(KeyCode.W))
                     {
-                        HandleOptionSelection(0); // Индекс 0 - первая опция
+                        HandleOptionSelection(0);
                     }
-                    if (Input.GetKeyDown(KeyCode.S)) // S для второго выбора
+                    if (Input.GetKeyDown(KeyCode.S))
                     {
-                        HandleOptionSelection(1); // Индекс 1 - вторая опция
+                        HandleOptionSelection(1);
                     }
-                    if (Input.GetKeyDown(KeyCode.A)) // A для третьего выбора
+                    if (Input.GetKeyDown(KeyCode.A))
                     {
-                        HandleOptionSelection(2); // Индекс 2 - третья опция
+                        HandleOptionSelection(2);
                     }
-                    if (Input.GetKeyDown(KeyCode.D)) // D для четвертого выбора
+                    if (Input.GetKeyDown(KeyCode.D))
                     {
-                        HandleOptionSelection(3); // Индекс 3 - четвертая опция
+                        HandleOptionSelection(3);
                     }
                 }
             }
-            else // Если объект далеко
+            else
             {
                 SetCircleColor(currentHighlightedObject, farColor);
             }
@@ -176,71 +179,101 @@ public class CameraRaycast : MonoBehaviour
         }
     }
 
-    // Показываем доступные опции из дерева состояний
-    private void ShowOptions()
+private void ShowOptions(GameObject obj)
+{
+    var availableActions = stateTree.GetAvailableActions();
+    int index = 0;
+
+    // Получение текстовых элементов
+    ActionTextW = obj.transform.Find("UI/Options/W/ActionTextW")?.GetComponent<TMP_Text>();
+    ActionTextA = obj.transform.Find("UI/Options/A/ActionTextA")?.GetComponent<TMP_Text>();
+    ActionTextS = obj.transform.Find("UI/Options/S/ActionTextS")?.GetComponent<TMP_Text>();
+    ActionTextD = obj.transform.Find("UI/Options/D/ActionTextD")?.GetComponent<TMP_Text>();
+
+    // Получение изображений
+    imageW = obj.transform.Find("UI/Options/W")?.GetComponent<Image>();
+    imageA = obj.transform.Find("UI/Options/A")?.GetComponent<Image>();
+    imageS = obj.transform.Find("UI/Options/S")?.GetComponent<Image>();
+    imageD = obj.transform.Find("UI/Options/D")?.GetComponent<Image>();
+
+    TMP_Text[] actionTexts = { ActionTextW, ActionTextS, ActionTextA, ActionTextD };
+    Image[] actionImages = { imageW, imageS, imageA, imageD };
+
+    // Устанавливаем текст и активируем изображения
+    foreach (var action in availableActions.Values)
     {
-        
-        var availableActions = stateTree.GetAvailableActions(); // Получаем доступные пути
-        int optionIndex = 0;
-
-        foreach (var action in availableActions.Values)
+        if (index < actionTexts.Length && actionTexts[index] != null && actionImages[index] != null)
         {
-            Debug.Log($"Опция {optionIndex + 1}: {action.uiText}");
-            optionIndex++;
+            actionTexts[index].text = action.uiText; // Устанавливаем текст опции
+            actionTexts[index].gameObject.SetActive(true); // Делаем текст активным
+            actionImages[index].gameObject.SetActive(true); // Делаем изображение активным
         }
-
-        Debug.Log("Опции доступны. Нажмите W, S, A, D для выбора.");
+        index++;
     }
 
-    // Обработка выбора опции
+    // Очищаем оставшиеся элементы и скрываем изображения
+    for (int i = index; i < actionTexts.Length; i++)
+    {
+        if (actionTexts[i] != null)
+        {
+            actionTexts[i].text = string.Empty; // Очищаем текст
+            actionTexts[i].gameObject.SetActive(false); // Делаем текст неактивным
+        }
+
+        if (actionImages[i] != null)
+        {
+            actionImages[i].gameObject.SetActive(false); // Делаем изображение неактивным
+        }
+    }
+
+    Debug.Log("Опции и изображения обновлены.");
+}
+
+
     private void HandleOptionSelection(int optionIndex)
     {
-        var availableActions = stateTree.GetAvailableActions().Values.ToList(); // Получаем доступные пути как список
-        Debug.Log($"Количество доступных опций: {availableActions.Count}");  // Логируем количество доступных опций
-
-        // Проверяем, что выбранный индекс в пределах доступных опций
+        var availableActions = stateTree.GetAvailableActions().Values.ToList();
         if (optionIndex >= 0 && optionIndex < availableActions.Count)
         {
             var selectedPath = availableActions[optionIndex];
-            Debug.Log($"Вы выбрали индекс: {optionIndex}, опция: {selectedPath.uiText}");
-
-            // Переход в следующий узел в дереве состояний
+            Debug.Log($"Вы выбрали: {selectedPath.uiText}");
             stateTree.MoveToNode(selectedPath.targetNode.nodeName);
-            Debug.Log($"Переход к узлу: {selectedPath.targetNode.nodeName}");  // Логируем переход в следующий узел
+            ResetUI();
         }
         else
         {
-            Debug.LogWarning($"Неверный выбор опции: {optionIndex}. Доступные индексы от 0 до {availableActions.Count - 1}");
+            Debug.LogWarning($"Неверный выбор опции: {optionIndex}");
         }
     }
 
-
-    // Замораживаем или разблокируем камеру
-    private void FreezeCamera(bool freeze)
-    {
-        var transposer = virtualCamera.GetCinemachineComponent<CinemachineTransposer>();
-        if (transposer != null)
-        {
-            transposer.m_XDamping = freeze ? 1000f : 1f;
-            transposer.m_YDamping = freeze ? 1000f : 1f;
-            transposer.m_ZDamping = freeze ? 1000f : 1f;
-            Debug.Log($"Камера заморожена: {freeze}");
-        }
-    }
-
-    // Сбросить UI (если объект не наведен)
     private void ResetUI()
     {
         if (currentHighlightedObject != null)
         {
-            Debug.Log($"Сброс выделения объекта: {currentHighlightedObject.name}");
             SetCircleColor(currentHighlightedObject, farColor);
-            SetOptionsActive(currentHighlightedObject, false);
             currentHighlightedObject = null;
+        }
+
+        if (ActionTextW != null && ActionTextA !=null && ActionTextS !=null && ActionTextD !=null)
+        {
+            TMP_Text [] actionTexts = { ActionTextW, ActionTextS, ActionTextA, ActionTextD };
+            foreach (var text in actionTexts)
+            {
+                text.text = string.Empty;
+                text.gameObject.SetActive(false);
+            }
+        }
+
+        if (imageW != null && imageA !=null && imageS !=null && imageD !=null)
+        {
+            Image [] actionImages = { imageW, imageA, imageS, imageD };
+            foreach (var image in actionImages)
+            {
+                image.gameObject.SetActive(false);
+            }
         }
     }
 
-    // Изменение цвета круга
     private void SetCircleColor(GameObject obj, Color color)
     {
         Transform circle = obj.transform.Find("UI/Circle");
@@ -250,19 +283,20 @@ public class CameraRaycast : MonoBehaviour
             if (image != null)
             {
                 image.color = color;
-               // Debug.Log($"Цвет круга установлен: {color}");
             }
         }
     }
 
-    // Включение/выключение опций UI
-    private void SetOptionsActive(GameObject obj, bool isActive)
+    
+
+    private void FreezeCamera(bool freeze)
     {
-        Transform options = obj.transform.Find("UI/Options");
-        if (options != null)
+        var transposer = virtualCamera.GetCinemachineComponent<CinemachineTransposer>();
+        if (transposer != null)
         {
-            options.gameObject.SetActive(isActive);
-            Debug.Log($"UI Options для {obj.name} активны: {isActive}");
+            transposer.m_XDamping = freeze ? 1000f : 1f;
+            transposer.m_YDamping = freeze ? 1000f : 1f;
+            transposer.m_ZDamping = freeze ? 1000f : 1f;
         }
     }
 }
