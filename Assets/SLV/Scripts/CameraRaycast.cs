@@ -1,6 +1,7 @@
 using UnityEngine;
 using Cinemachine;
 using StarterAssets;
+using System.Linq; // Add this line
 
 public class CameraRaycast : MonoBehaviour
 {
@@ -20,12 +21,14 @@ public class CameraRaycast : MonoBehaviour
 
     private GameObject currentOptionsObject; // Объект UI Options, на который наведена мышь
 
-    // Опции, доступные при удержании ЛКМ
-    private string[] options = new string[] { "Inspect", "Action", "Talk", "Examine" };
+    // Присваиваем ссылку на StateTree для получения доступных опций
+    public StateTree stateTree;
+
     private bool isMouseHeld = false;
 
     void Start()
     {
+        
         virtualCamera = GetComponent<CinemachineVirtualCamera>();
         if (virtualCamera != null)
         {
@@ -84,6 +87,7 @@ public class CameraRaycast : MonoBehaviour
             {
                 ResetUI();
                 currentHighlightedObject = hitObject;
+                stateTree = null;
                 Debug.Log($"Навели на объект: {hitObject.name}");
                 SetCircleColor(currentHighlightedObject, farColor);
             }
@@ -92,8 +96,8 @@ public class CameraRaycast : MonoBehaviour
             if (distance <= 5f) // Если объект близкий
             {
                 SetCircleColor(currentHighlightedObject, closeColor);
-
-                if (Input.GetMouseButton(0)) // ЛКМ удерживаем
+                stateTree = hitObject.GetComponent<StateTree>();
+                if (Input.GetMouseButton(0) && stateTree !=null) // ЛКМ удерживаем
                 {
                     if (!isCameraFrozen)
                     {
@@ -110,7 +114,7 @@ public class CameraRaycast : MonoBehaviour
                     }
                     SetCircleColor(currentHighlightedObject, clickedColor); // Цвет круга изменится на "кликнутый"
 
-                    // Показываем доступные опции
+                    // Показываем доступные опции, получаем их из дерева состояний
                     if (!isMouseHeld)
                     {
                         isMouseHeld = true;
@@ -143,21 +147,21 @@ public class CameraRaycast : MonoBehaviour
                 // Обработка выбора опций через WASD
                 if (isMouseHeld)
                 {
-                    if (Input.GetKeyDown(KeyCode.W)) // W для Inspect
+                    if (Input.GetKeyDown(KeyCode.W)) // W для первого выбора
                     {
-                        Debug.Log("Вы выбрали: Inspect");
+                        HandleOptionSelection(0); // Индекс 0 - первая опция
                     }
-                    if (Input.GetKeyDown(KeyCode.S)) // S для Action
+                    if (Input.GetKeyDown(KeyCode.S)) // S для второго выбора
                     {
-                        Debug.Log("Вы выбрали: Action");
+                        HandleOptionSelection(1); // Индекс 1 - вторая опция
                     }
-                    if (Input.GetKeyDown(KeyCode.A)) // A для Talk
+                    if (Input.GetKeyDown(KeyCode.A)) // A для третьего выбора
                     {
-                        Debug.Log("Вы выбрали: Talk");
+                        HandleOptionSelection(2); // Индекс 2 - третья опция
                     }
-                    if (Input.GetKeyDown(KeyCode.D)) // D для Examine
+                    if (Input.GetKeyDown(KeyCode.D)) // D для четвертого выбора
                     {
-                        Debug.Log("Вы выбрали: Examine");
+                        HandleOptionSelection(3); // Индекс 3 - четвертая опция
                     }
                 }
             }
@@ -171,6 +175,45 @@ public class CameraRaycast : MonoBehaviour
             ResetUI();
         }
     }
+
+    // Показываем доступные опции из дерева состояний
+    private void ShowOptions()
+    {
+        
+        var availableActions = stateTree.GetAvailableActions(); // Получаем доступные пути
+        int optionIndex = 0;
+
+        foreach (var action in availableActions.Values)
+        {
+            Debug.Log($"Опция {optionIndex + 1}: {action.uiText}");
+            optionIndex++;
+        }
+
+        Debug.Log("Опции доступны. Нажмите W, S, A, D для выбора.");
+    }
+
+    // Обработка выбора опции
+    private void HandleOptionSelection(int optionIndex)
+    {
+        var availableActions = stateTree.GetAvailableActions().Values.ToList(); // Получаем доступные пути как список
+        Debug.Log($"Количество доступных опций: {availableActions.Count}");  // Логируем количество доступных опций
+
+        // Проверяем, что выбранный индекс в пределах доступных опций
+        if (optionIndex >= 0 && optionIndex < availableActions.Count)
+        {
+            var selectedPath = availableActions[optionIndex];
+            Debug.Log($"Вы выбрали индекс: {optionIndex}, опция: {selectedPath.uiText}");
+
+            // Переход в следующий узел в дереве состояний
+            stateTree.MoveToNode(selectedPath.targetNode.nodeName);
+            Debug.Log($"Переход к узлу: {selectedPath.targetNode.nodeName}");  // Логируем переход в следующий узел
+        }
+        else
+        {
+            Debug.LogWarning($"Неверный выбор опции: {optionIndex}. Доступные индексы от 0 до {availableActions.Count - 1}");
+        }
+    }
+
 
     // Замораживаем или разблокируем камеру
     private void FreezeCamera(bool freeze)
@@ -207,7 +250,7 @@ public class CameraRaycast : MonoBehaviour
             if (image != null)
             {
                 image.color = color;
-                Debug.Log($"Цвет круга установлен: {color}");
+               // Debug.Log($"Цвет круга установлен: {color}");
             }
         }
     }
@@ -221,11 +264,5 @@ public class CameraRaycast : MonoBehaviour
             options.gameObject.SetActive(isActive);
             Debug.Log($"UI Options для {obj.name} активны: {isActive}");
         }
-    }
-
-    // Показываем доступные опции
-    private void ShowOptions()
-    {
-        Debug.Log("Опции доступны. Нажмите W, S, A, D для выбора.");
     }
 }

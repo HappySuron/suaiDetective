@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1920
     height: 997
   m_ShowMode: 4
-  m_Title: Hierarchy
+  m_Title: Console
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 332}
   m_MaxSize: {x: 10000, y: 10000}
@@ -271,8 +271,8 @@ MonoBehaviour:
     y: 613
     width: 1273
     height: 328
-  m_MinSize: {x: 101, y: 126}
-  m_MaxSize: {x: 4001, y: 4026}
+  m_MinSize: {x: 100, y: 100}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 18}
   m_Panes:
   - {fileID: 17}
@@ -300,8 +300,8 @@ MonoBehaviour:
     y: 0
     width: 647
     height: 941
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 276, y: 76}
+  m_MaxSize: {x: 4001, y: 4026}
   m_ActualView: {fileID: 21}
   m_Panes:
   - {fileID: 21}
@@ -446,9 +446,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
-      m_LastClickedID: 0
-      m_ExpandedIDs: b4faffff
+      m_SelectedIDs: baad0000
+      m_LastClickedID: 44474
+      m_ExpandedIDs: 1ef1ffff06f9ffffb4faffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1094,9 +1094,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: -8.107305, y: -0.50731725, z: -4.2115684}
+    m_Target: {x: -5.965122, y: 0.9630157, z: -4.517719}
     speed: 2
-    m_Value: {x: -8.107305, y: -0.50731725, z: -4.2115684}
+    m_Value: {x: -5.965122, y: 0.9630157, z: -4.517719}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1146,9 +1146,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0.32895544, y: 0.36163554, z: -0.13810979, w: 0.8613558}
   m_Size:
-    m_Target: 2.6829739
+    m_Target: 1.2265176
     speed: 2
-    m_Value: 2.6829739
+    m_Value: 1.2265176
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -1298,7 +1298,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets
+    - Assets/SLV/TreeScripts
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -1308,16 +1308,16 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 46
   m_LastFolders:
-  - Assets
+  - Assets/SLV/TreeScripts
   m_LastFoldersGridSize: 46
   m_LastProjectPath: C:\_myfiles\UnityProj\suaiDetective
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 79}
-    m_SelectedIDs: 1edc0000
-    m_LastClickedID: 56350
-    m_ExpandedIDs: 000000001edc000000ca9a3bffffff7f
+    m_SelectedIDs: 82de0000
+    m_LastClickedID: 56962
+    m_ExpandedIDs: 0000000040dc0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1346,7 +1346,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000001edc0000
+    m_ExpandedIDs: 0000000040dc0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1372,9 +1372,9 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 
-    m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 0
+    m_SelectedInstanceIDs: 9c9d0000
+    m_LastClickedInstanceID: 40348
+    m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: 74e0000012c40000c4cb00008cbc000022b4000000000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -1478,7 +1478,7 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_LockTracker:
     m_IsLocked: 0
-  m_LastSelectedObjectID: 43968
+  m_LastSelectedObjectID: 44560
 --- !u!114 &20
 MonoBehaviour:
   m_ObjectHideFlags: 52
