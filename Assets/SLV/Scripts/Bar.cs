@@ -16,7 +16,7 @@ public class Bar : StateTree
         Node barThird2 = new Node("Бар третичный узел 2");
 
         // Добавляем пути
-        barFirstOne.AddPath(new Path(barSecond1, "none", 0, uiText:"Перейти в первичный 1"));
+        barFirstOne.AddPath(new Path(barSecond1, "none", 0, uiText:"Перейти в вторичный 1"));
         barFirstOne.AddPath(new Path(barSecond2, uiText:"Перейти во вторичный 2"));
         barFirstOne.AddPath(new Path(barSecond3, uiText:"Перейти во вторичный 3"));
         barFirstOne.AddPath(new Path(barSecond4, uiText:"Перейти во вторичный 4"));
