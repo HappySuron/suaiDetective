@@ -1,7 +1,19 @@
 using UnityEngine;
+using System;
+using System.Runtime.CompilerServices;
 
 public class Bar : StateTree
 {
+    [Header ("ItemInfoLook")]
+    public GameObject player;
+    public AudioClip audioClip; // Аудиофайл с SFX
+
+
+    [Header ("ItemDescriptionInfo")]
+    public string itemName = "Бар";
+    public string itemDescription = "Это бар";
+
+    public Sprite itemImage;
     void Awake()
     {
         treeName = "BarTree";
@@ -14,6 +26,22 @@ public class Bar : StateTree
         Node barSecond4 = new Node("Бар вторичный узел 4");
         Node barThird1 = new Node("Бар третичный узел 1");
         Node barThird2 = new Node("Бар третичный узел 2");
+
+
+        barSecond1.OnEnterAction = () =>
+        {
+            Debug.Log("Debug Actions works good");
+            AudioManager.Instance.PlayDialogue(audioClip, "Это тест тест тест текстовое сообщение");
+        };
+
+        barSecond2.OnEnterAction = () =>
+        {
+            Debug.Log("Debug Actions works good");
+            ItemInteractionUI.Instance.ShowItemInterface(name: itemName, description: itemDescription, image: itemImage);
+        };
+
+
+
 
         // Добавляем пути
         barFirstOne.AddPath(new Path(barSecond1, "none", 0, uiText:"Перейти в вторичный 1"));

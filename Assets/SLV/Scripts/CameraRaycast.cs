@@ -86,7 +86,7 @@ public class CameraRaycast : MonoBehaviour
         RaycastHit hit;
         Debug.DrawRay(ray.origin, ray.direction * rayDistance, Color.green);
 
-        if (Physics.Raycast(ray, out hit, rayDistance, ~ignoreLayerMask))
+        if (Physics.Raycast(ray, out hit, rayDistance, ~ignoreLayerMask) && !ItemInteractionUI.Instance.CheckIfActive())
         {
             GameObject hitObject = hit.collider.gameObject;
 
@@ -134,7 +134,7 @@ public class CameraRaycast : MonoBehaviour
                         FreezeCamera(false);
                         isCameraFrozen = false;
 
-                        if (thirdPersonController != null)
+                        if (thirdPersonController != null && !ItemInteractionUI.Instance.CheckIfActive())
                         {
                             thirdPersonController.enabled = true;
                             Debug.Log("Контроллер персонажа включен.");
@@ -239,6 +239,8 @@ private void ShowOptions(GameObject obj)
             Debug.Log($"Вы выбрали: {selectedPath.uiText}");
             stateTree.MoveToNode(selectedPath.targetNode.nodeName);
             ResetUI();
+            currentHighlightedObject = null;
+            isMouseHeld = false;
         }
         else
         {
