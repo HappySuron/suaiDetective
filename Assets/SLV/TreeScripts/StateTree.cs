@@ -11,7 +11,12 @@ public class StateTree : MonoBehaviour
     public void MoveToNode(string targetNodeName)
     {
         Omniscient _omniscient = Omniscient.Instance;
-        if (_omniscient==null) Debug.Log("dfsdfasdfadsfasdfasdfsadf");
+        if (_omniscient == null)
+        {
+            Debug.LogError("Omniscient instance is null!");
+            return;
+        }
+
         Node targetNode = nodes.Find(node => node.nodeName == targetNodeName);
         if (targetNode == null)
         {
@@ -30,8 +35,9 @@ public class StateTree : MonoBehaviour
         {
             _omniscient.UseTokens(availablePath.tokenType, availablePath.tokensRequired);
             currentNode = targetNode;
+
             Debug.Log($"Перешли в узел: {currentNode.nodeName}");
-            //ShowAvailableActions(); // Показываем доступные действия
+            currentNode.OnEnter(); // Выполняем действие узла
         }
         else
         {

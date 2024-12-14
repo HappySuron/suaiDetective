@@ -1,25 +1,36 @@
+
+using System;
 using System.Collections.Generic;
 
 [System.Serializable]
 
-public class Node
-{
-    public string nodeName;
-    public bool isInteractive;  // Флаг, можно ли взаимодействовать с узлом
-    public List<Path> paths = new List<Path>();
-
-    public Node(string name, bool isInteractive = true)
+    public class Node
     {
-        this.nodeName = name;
-        this.isInteractive = isInteractive;
-    }
+        public string nodeName;
+        public bool isInteractive;  // Флаг, можно ли взаимодействовать с узлом
+        public List<Path> paths = new List<Path>();
 
-    // Добавляем путь
-    public void AddPath(Path path)
-    {
-        paths.Add(path);
+        // Делегат для выполнения действий при входе в узел
+        public Action OnEnterAction;
+
+        public Node(string name, bool isInteractive = true)
+        {
+            this.nodeName = name;
+            this.isInteractive = isInteractive;
+        }
+
+        // Вызывается при входе в узел
+        public virtual void OnEnter()
+        {
+            OnEnterAction?.Invoke(); // Выполнить действие, если оно задано
+        }
+
+        // Добавляем путь
+        public void AddPath(Path path)
+        {
+            paths.Add(path);
+        }
     }
-}
 public class Path
 {
     public Node targetNode;
