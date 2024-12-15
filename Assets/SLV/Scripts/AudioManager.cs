@@ -1,110 +1,91 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Audio; // Для работы с AudioMixer
+using UnityEngine.Audio;
 using TMPro;
 
 public class AudioManager : MonoBehaviour
 {
-    public static AudioManager Instance; // Синглтон для глобального доступа
+    public static AudioManager Instance;
 
     [Header("Audio Sources")]
-    public AudioSource musicSource;   // Источник для фоновой музыки
-    public AudioSource sfxSource;     // Источник для SFX (2D)
-    public AudioSource dialogueSource; // Источник для диалогов (2D)
+    public AudioSource musicSource;
+    public AudioSource sfxSource;
+    public AudioSource dialogueSource;
 
     [Header("Audio Mixer Settings")]
-    public AudioMixerGroup musicGroup;   // Группа для музыки
-    public AudioMixerGroup sfxGroup;     // Группа для SFX
-    public AudioMixerGroup dialogueGroup; // Группа для диалогов
+    public AudioMixerGroup musicGroup;
+    public AudioMixerGroup sfxGroup;
+    public AudioMixerGroup dialogueGroup;
 
     [Header("Background Music")]
     public AudioClip defaultBackgroundMusic;
 
-
     [Header("Subtitles")]
-    public TMP_Text subtitleText; // UI-элемент для отображения субтитров
-    public float subtitleFadeDuration = 1f; // Время исчезновения субтитров
+    public TMP_Text subtitleText;
+    public float subtitleFadeDuration = 1f;
 
     private void Awake()
     {
-        // Настраиваем синглтон
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
-
         Instance = this;
-        DontDestroyOnLoad(gameObject); // Сохраняем объект между сценами
+        DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
     {
-        // Автозапуск фоновой музыки
         if (defaultBackgroundMusic != null)
         {
             PlayMusic(defaultBackgroundMusic);
         }
     }
 
-    // Воспроизведение музыки (фоновой)
     public void PlayMusic(AudioClip clip)
     {
         if (clip == null) return;
 
         musicSource.clip = clip;
         musicSource.loop = true;
-        musicSource.outputAudioMixerGroup = musicGroup; // Применяем группу микшера для музыки
+        musicSource.outputAudioMixerGroup = musicGroup;
         musicSource.Play();
     }
 
-    // Воспроизведение SFX на NPC (3D звук)
-    public void PlaySFXOnObject(GameObject obj, AudioClip sfxClip)
+    public void PlayDialogueSequence(AudioClip[] dialogueClips, string[] subtitles = null)
     {
-        // Получаем или добавляем AudioSource на NPC
-        AudioSource source = obj.GetComponent<AudioSource>();
-        if (source == null)
+        if (dialogueClips == null || dialogueClips.Length == 0)
         {
-            source = obj.AddComponent<AudioSource>();
-        }
-
-        // Устанавливаем параметры для 3D звука
-        source.clip = sfxClip;
-        source.spatialBlend = 1.0f; // Задаем 3D-звук (не плоский)
-        source.outputAudioMixerGroup = sfxGroup; // Применяем группу микшера для SFX
-        source.Play();
-
-        // Удаляем AudioSource после проигрывания
-        Destroy(source, sfxClip.length);
-    }
-
-    public void PlayDialogue(GameObject npc, AudioClip dialogueClip, string subtitles = null)
-    {
-        if (npc == null)
-        {
-            Debug.LogWarning("NPC объект не указан. Используйте перегруженный метод для 2D звука.");
+            Debug.LogWarning("Нет аудиоклипов для воспроизведения.");
             return;
         }
 
-        // Воспроизведение 3D звука на NPC
-        AudioSource source = npc.GetComponent<AudioSource>();
-        if (source == null)
+        if (subtitles != null && subtitles.Length != dialogueClips.Length)
         {
-            source = npc.AddComponent<AudioSource>();
+            Debug.LogWarning("Количество субтитров не совпадает с количеством аудиоклипов.");
+            return;
         }
 
-        source.clip = dialogueClip;
-        source.spatialBlend = 1.0f; // 3D звук
-        source.outputAudioMixerGroup = dialogueGroup;
-        source.Play();
+        StartCoroutine(PlayDialogueQueue(dialogueClips, subtitles));
+    }
 
-        // Отображение субтитров
-        if (!string.IsNullOrEmpty(subtitles) && subtitleText != null)
+    private IEnumerator PlayDialogueQueue(AudioClip[] clips, string[] subtitles)
+    {
+        for (int i = 0; i < clips.Length; i++)
         {
-            StopAllCoroutines();
-            StartCoroutine(ShowSubtitles(subtitles, dialogueClip.length));
-        }
+            AudioClip clip = clips[i];
+            string subtitle = subtitles != null && i < subtitles.Length ? subtitles[i] : null;
 
-        Destroy(source, dialogueClip.length);
+            PlayDialogue(clip, subtitle);
+
+            // Ждем, пока аудио проигрывается
+            yield return new WaitForSeconds(clip.length);
+
+            // Добавим небольшую паузу между диалогами (если нужно)
+            yield return new WaitForSeconds(0.2f);
+        }
     }
 
     public void PlayDialogue(AudioClip dialogueClip, string subtitles = null)
@@ -115,29 +96,26 @@ public class AudioManager : MonoBehaviour
             return;
         }
 
-        // Воспроизведение 2D звука через глобальный источник
         dialogueSource.clip = dialogueClip;
         dialogueSource.outputAudioMixerGroup = dialogueGroup;
         dialogueSource.Play();
 
-        // Отображение субтитров
         if (!string.IsNullOrEmpty(subtitles) && subtitleText != null)
         {
-            StopAllCoroutines();
+            // Используем длину аудиофайла для определения времени показа субтитров
             StartCoroutine(ShowSubtitles(subtitles, dialogueClip.length));
         }
     }
 
-
-    // Корутин для показа субтитров
-    private System.Collections.IEnumerator ShowSubtitles(string text, float duration)
+    private IEnumerator ShowSubtitles(string text, float duration)
     {
         subtitleText.text = text;
         subtitleText.color = new Color(subtitleText.color.r, subtitleText.color.g, subtitleText.color.b, 1);
 
+        // Ждем, пока длительность аудио
         yield return new WaitForSeconds(duration);
 
-        // Плавное исчезновение субтитров
+        // Начинаем исчезновение субтитров
         float elapsedTime = 0;
         Color initialColor = subtitleText.color;
         while (elapsedTime < subtitleFadeDuration)
@@ -148,6 +126,6 @@ public class AudioManager : MonoBehaviour
             yield return null;
         }
 
-        subtitleText.text = "";
+        subtitleText.text = ""; // Очищаем субтитры после исчезновения
     }
 }

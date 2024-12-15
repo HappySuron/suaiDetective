@@ -33,7 +33,7 @@ public class StateTree : MonoBehaviour
 
         if (_omniscient.HasTokens(availablePath.tokenType, availablePath.tokensRequired))
         {
-            _omniscient.UseTokens(availablePath.tokenType, availablePath.tokensRequired);
+          //  _omniscient.UseTokens(availablePath.tokenType, availablePath.tokensRequired);
             currentNode = targetNode;
 
             Debug.Log($"Перешли в узел: {currentNode.nodeName}");

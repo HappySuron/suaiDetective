@@ -86,7 +86,7 @@ public class CameraRaycast : MonoBehaviour
         RaycastHit hit;
         Debug.DrawRay(ray.origin, ray.direction * rayDistance, Color.green);
 
-        if (Physics.Raycast(ray, out hit, rayDistance, ~ignoreLayerMask) && !ItemInteractionUI.Instance.CheckIfActive())
+        if (Physics.Raycast(ray, out hit, rayDistance, ~ignoreLayerMask) && !ItemInteractionUI.Instance.CheckIfActive() && !DialogUI.Instance.CheckIfDialogActive())
         {
             GameObject hitObject = hit.collider.gameObject;
 
@@ -179,55 +179,55 @@ public class CameraRaycast : MonoBehaviour
         }
     }
 
-private void ShowOptions(GameObject obj)
-{
-    var availableActions = stateTree.GetAvailableActions();
-    int index = 0;
-
-    // Получение текстовых элементов
-    ActionTextW = obj.transform.Find("UI/Options/W/ActionTextW")?.GetComponent<TMP_Text>();
-    ActionTextA = obj.transform.Find("UI/Options/A/ActionTextA")?.GetComponent<TMP_Text>();
-    ActionTextS = obj.transform.Find("UI/Options/S/ActionTextS")?.GetComponent<TMP_Text>();
-    ActionTextD = obj.transform.Find("UI/Options/D/ActionTextD")?.GetComponent<TMP_Text>();
-
-    // Получение изображений
-    imageW = obj.transform.Find("UI/Options/W")?.GetComponent<Image>();
-    imageA = obj.transform.Find("UI/Options/A")?.GetComponent<Image>();
-    imageS = obj.transform.Find("UI/Options/S")?.GetComponent<Image>();
-    imageD = obj.transform.Find("UI/Options/D")?.GetComponent<Image>();
-
-    TMP_Text[] actionTexts = { ActionTextW, ActionTextS, ActionTextA, ActionTextD };
-    Image[] actionImages = { imageW, imageS, imageA, imageD };
-
-    // Устанавливаем текст и активируем изображения
-    foreach (var action in availableActions.Values)
+    private void ShowOptions(GameObject obj)
     {
-        if (index < actionTexts.Length && actionTexts[index] != null && actionImages[index] != null)
+        var availableActions = stateTree.GetAvailableActions();
+        int index = 0;
+
+        // Получение текстовых элементов
+        ActionTextW = obj.transform.Find("UI/Options/W/ActionTextW")?.GetComponent<TMP_Text>();
+        ActionTextA = obj.transform.Find("UI/Options/A/ActionTextA")?.GetComponent<TMP_Text>();
+        ActionTextS = obj.transform.Find("UI/Options/S/ActionTextS")?.GetComponent<TMP_Text>();
+        ActionTextD = obj.transform.Find("UI/Options/D/ActionTextD")?.GetComponent<TMP_Text>();
+
+        // Получение изображений
+        imageW = obj.transform.Find("UI/Options/W")?.GetComponent<Image>();
+        imageA = obj.transform.Find("UI/Options/A")?.GetComponent<Image>();
+        imageS = obj.transform.Find("UI/Options/S")?.GetComponent<Image>();
+        imageD = obj.transform.Find("UI/Options/D")?.GetComponent<Image>();
+
+        TMP_Text[] actionTexts = { ActionTextW, ActionTextS, ActionTextA, ActionTextD };
+        Image[] actionImages = { imageW, imageS, imageA, imageD };
+
+        // Устанавливаем текст и активируем изображения
+        foreach (var action in availableActions.Values)
         {
-            actionTexts[index].text = action.uiText; // Устанавливаем текст опции
-            actionTexts[index].gameObject.SetActive(true); // Делаем текст активным
-            actionImages[index].gameObject.SetActive(true); // Делаем изображение активным
+            if (index < actionTexts.Length && actionTexts[index] != null && actionImages[index] != null)
+            {
+                actionTexts[index].text = action.uiText; // Устанавливаем текст опции
+                actionTexts[index].gameObject.SetActive(true); // Делаем текст активным
+                actionImages[index].gameObject.SetActive(true); // Делаем изображение активным
+            }
+            index++;
         }
-        index++;
+
+        // Очищаем оставшиеся элементы и скрываем изображения
+        for (int i = index; i < actionTexts.Length; i++)
+        {
+            if (actionTexts[i] != null)
+            {
+                actionTexts[i].text = string.Empty; // Очищаем текст
+                actionTexts[i].gameObject.SetActive(false); // Делаем текст неактивным
+            }
+
+            if (actionImages[i] != null)
+            {
+                actionImages[i].gameObject.SetActive(false); // Делаем изображение неактивным
+            }
+        }
+
+        Debug.Log("Опции и изображения обновлены.");
     }
-
-    // Очищаем оставшиеся элементы и скрываем изображения
-    for (int i = index; i < actionTexts.Length; i++)
-    {
-        if (actionTexts[i] != null)
-        {
-            actionTexts[i].text = string.Empty; // Очищаем текст
-            actionTexts[i].gameObject.SetActive(false); // Делаем текст неактивным
-        }
-
-        if (actionImages[i] != null)
-        {
-            actionImages[i].gameObject.SetActive(false); // Делаем изображение неактивным
-        }
-    }
-
-    Debug.Log("Опции и изображения обновлены.");
-}
 
 
     private void HandleOptionSelection(int optionIndex)
