@@ -8,6 +8,8 @@ public class Omniscient : MonoBehaviour
     public StateTree doorTree;
 
     public Bar barTree;
+
+    public BartenderTree bartenderTree;
     public static Omniscient Instance {get; private set;}
     void Start()
     {
@@ -25,8 +27,12 @@ public class Omniscient : MonoBehaviour
         // Инициализируем жетоны
         tokens["key"] = 0;
         tokens["none"] = 0;
-        doorTree.ShowAvailableActions();
-        keyTree.ShowAvailableActions();
+
+        tokens["noHelpForBartender"] = 0;
+        tokens["didHelpForBartender"] =0;
+        tokens["noTalkToMafia"] = 1;
+        // doorTree.ShowAvailableActions();
+        // keyTree.ShowAvailableActions();
         // doorTree.MoveToNode("Дверь открыта", this);
         // Проверим взаимодействие
         // keyTree.MoveToNode("Ключ доступен", this);
@@ -51,4 +57,6 @@ public class Omniscient : MonoBehaviour
             Debug.Log($"Использовано {amount} токенов {tokenType}. Осталось: {tokens[tokenType]}.");
         }
     }
+
+
 }
